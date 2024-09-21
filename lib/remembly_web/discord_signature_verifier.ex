@@ -3,7 +3,7 @@ defmodule DiscordSignatureVerifier do
     payload = "#{timestamp}#{body}"
 
     case Ed25519.valid_signature?(from_hex(expected_signature), payload, from_hex(key)) do
-      true -> :ok
+      true -> {:ok, "good sig baby"}
       false -> {:error, "Signatures do not match"}
     end
   end
