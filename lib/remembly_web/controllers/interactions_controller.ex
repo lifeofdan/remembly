@@ -15,8 +15,6 @@ defmodule RememblyWeb.InteractionsController do
         public_key
       )
 
-    dbg(response)
-
     case response do
       :ok ->
         if params["type"] == 1 do
