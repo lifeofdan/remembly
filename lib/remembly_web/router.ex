@@ -1,4 +1,5 @@
 defmodule RememblyWeb.Router do
+  alias RememblyWeb.InteractionsController
   use RememblyWeb, :router
 
   pipeline :browser do
@@ -20,10 +21,26 @@ defmodule RememblyWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", RememblyWeb do
-  #   pipe_through :api
-  # end
+  scope "/interactions" do
+    pipe_through :api
+
+    post "/", InteractionsController, :greet
+  end
+
+  scope "/api" do
+    pipe_through :api
+
+    forward "/swaggerui",
+            OpenApiSpex.Plug.SwaggerUI,
+            path: "/api/open_api",
+            default_model_expand_depth: 4
+
+    forward "/redoc",
+            Redoc.Plug.RedocUI,
+            spec_url: "/api/open_api"
+
+    forward "/", RememblyWeb.JsonApiRouter
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:remembly, :dev_routes) do

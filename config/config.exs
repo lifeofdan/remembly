@@ -17,6 +17,7 @@ config :spark,
     remove_parens?: true,
     "Ash.Resource": [
       section_order: [
+        :json_api,
         :postgres,
         :resource,
         :code_interface,
@@ -34,12 +35,20 @@ config :spark,
         :identities
       ]
     ],
-    "Ash.Domain": [section_order: [:resources, :policies, :authorization, :domain, :execution]]
+    "Ash.Domain": [
+      section_order: [:json_api, :resources, :policies, :authorization, :domain, :execution]
+    ]
   ]
+
+config :remembly, :ash_domains, [Remembly.Remember]
 
 config :remembly,
   ecto_repos: [Remembly.Repo],
   generators: [timestamp_type: :utc_datetime]
+
+config :mime,
+  extensions: %{"json" => "application/vnd.api+json"},
+  types: %{"application/vnd.api+json" => ["json"]}
 
 # Configures the endpoint
 config :remembly, RememblyWeb.Endpoint,
