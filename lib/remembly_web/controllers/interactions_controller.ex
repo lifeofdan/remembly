@@ -55,24 +55,16 @@ defmodule RememblyWeb.InteractionsController do
             })
 
           "recall" ->
-            messages = Remembly.Remember.Message |> Ash.Query.for_read(:read) |> Ash.read!()
+            messages =
+              Remembly.Remember.Message
+              |> Ash.Query.for_read(:read)
+              |> Ash.read!()
+              |> Ash.load!(:short_content)
 
             options =
               Enum.map(messages, fn message ->
-                %{label: message.content, value: message.id}
+                %{label: message.short_content, value: message.id}
               end)
-
-            #             {
-            #     "content": "This is a message with components",
-            #     "components": [
-            #         {
-            #             "type": 1,
-            #             "components": []
-            #         }
-            #     ]
-            # }
-
-            conn = conn |> put_resp_content_type("application/json") |> put_status(200)
 
             json(conn, %{
               type: 4,
@@ -81,11 +73,12 @@ defmodule RememblyWeb.InteractionsController do
                 components: [
                   %{
                     type: 1,
+                    placeholder: "foo",
                     components: [
                       %{
                         type: 3,
-                        custom_id: "saved_messages_#{params["id"]}",
-                        options: options
+                        options: options,
+                        custom_id: "foo"
                       }
                     ]
                   }

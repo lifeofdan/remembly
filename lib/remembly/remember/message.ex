@@ -5,6 +5,8 @@ defmodule Remembly.Remember.Message do
     data_layer: AshPostgres.DataLayer,
     extensions: [AshJsonApi.Resource]
 
+  require Ash.Expr
+
   json_api do
     type "message"
   end
@@ -28,5 +30,10 @@ defmodule Remembly.Remember.Message do
     attribute :content, :string, allow_nil?: false
 
     timestamps()
+  end
+
+  calculations do
+    calculate :short_content, :string, Remembly.Remember.Message.Calculations.ShortContent,
+      allow_nil?: false
   end
 end
