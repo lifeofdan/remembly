@@ -1,7 +1,8 @@
 defmodule RememblyWeb.InteractionsController do
+  require Ash.Query
   use RememblyWeb, :controller
 
-  def greet(conn, params) do
+  def index(conn, params) do
     signature = conn |> get_req_header("x-signature-ed25519") |> List.first()
     timestamp = conn |> get_req_header("x-signature-timestamp") |> List.first()
     public_key = System.get_env("DISCORD_PUBLIC_KEY")
@@ -17,17 +18,107 @@ defmodule RememblyWeb.InteractionsController do
 
     case response do
       :ok ->
-        if params["type"] == 1 do
-          conn = conn |> put_resp_content_type("application/json") |> put_status(200)
-          json(conn, %{type: 1})
-        else
-          conn = conn |> put_resp_content_type("application/json") |> put_status(400)
-          json(conn, %{error: "unknown command"})
-        end
+        do_command(conn, params)
 
       :error ->
         conn = conn |> put_resp_content_type("application/json") |> put_status(401)
         json(conn, "Bad request signature")
+    end
+  end
+
+  defp do_command(conn, params) do
+    data = params["data"]
+
+    case params["type"] do
+      1 ->
+        conn = conn |> put_resp_content_type("application/json") |> put_status(200)
+        json(conn, %{type: 1})
+
+      2 ->
+        case data["name"] do
+          "test" ->
+            conn = conn |> put_resp_content_type("application/json") |> put_status(200)
+            json(conn, %{type: 4, data: %{content: "hello from the #{data["name"]} command"}})
+
+          "remember" ->
+            messages = params["data"]["resolved"]["messages"]
+            [message_id] = Map.keys(messages)
+            message = Map.get(messages, message_id)
+
+            Remembly.Remember.message!(%{content: message["content"]})
+
+            conn = conn |> put_resp_content_type("application/json") |> put_status(200)
+
+            json(conn, %{
+              type: 4,
+              data: %{content: "I will remember this so you don't have to!", flags: 64}
+            })
+
+          "recall" ->
+            messages = Remembly.Remember.Message |> Ash.Query.for_read(:read) |> Ash.read!()
+
+            options =
+              Enum.map(messages, fn message ->
+                %{label: message.content, value: message.id}
+              end)
+
+            #             {
+            #     "content": "This is a message with components",
+            #     "components": [
+            #         {
+            #             "type": 1,
+            #             "components": []
+            #         }
+            #     ]
+            # }
+
+            conn = conn |> put_resp_content_type("application/json") |> put_status(200)
+
+            json(conn, %{
+              type: 4,
+              data: %{
+                content: "Saved messages",
+                components: [
+                  %{
+                    type: 1,
+                    components: [
+                      %{
+                        type: 3,
+                        custom_id: "saved_messages_#{params["id"]}",
+                        options: options
+                      }
+                    ]
+                  }
+                ],
+                flags: 64
+              }
+            })
+
+          _ ->
+            conn = conn |> put_resp_content_type("application/json") |> put_status(400)
+            json(conn, %{error: "unknown command"})
+        end
+
+      3 ->
+        [message_id] = data["values"]
+
+        message =
+          Remembly.Remember.Message
+          |> Ash.Query.filter(id == ^message_id)
+          |> Ash.read_first!()
+
+        json(conn, %{
+          type: 7,
+          data: %{
+            content: message.content,
+            components: [],
+            flags: 64
+          }
+        })
+
+      _ ->
+        conn = conn |> put_resp_content_type("application/json") |> put_status(400)
+        json(conn, %{error: "unknown command"})
     end
   end
 end

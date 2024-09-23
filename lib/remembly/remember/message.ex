@@ -1,4 +1,4 @@
-defmodule Remembly.Remember.Link do
+defmodule Remembly.Remember.Message do
   use Ash.Resource,
     otp_app: :remembly,
     domain: Remembly.Remember,
@@ -6,26 +6,26 @@ defmodule Remembly.Remember.Link do
     extensions: [AshJsonApi.Resource]
 
   json_api do
-    type "link"
+    type "message"
   end
 
   postgres do
-    table "links"
+    table "messages"
     repo Remembly.Repo
   end
 
   actions do
     defaults [:read, :destroy, create: :*, update: :*]
 
-    create :remember_link do
-      accept [:url]
+    create :remember_message do
+      accept [:content]
     end
   end
 
   attributes do
     uuid_primary_key :id
 
-    attribute :url, :string, allow_nil?: false
+    attribute :content, :string, allow_nil?: false
 
     timestamps()
   end

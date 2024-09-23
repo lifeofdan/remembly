@@ -1,10 +1,11 @@
 defmodule Remembly.Remember do
+  alias Remembly.Remember.Message
   use Ash.Domain, extensions: [AshJsonApi.Domain]
 
   json_api do
     routes do
       # in the domain `base_route` acts like a scope
-      base_route "/links", Remembly.Remember.Link do
+      base_route "/messages", Message do
         get :read
         index :read
         post :create
@@ -13,6 +14,8 @@ defmodule Remembly.Remember do
   end
 
   resources do
-    resource Remembly.Remember.Link
+    resource Message do
+      define :message, action: :remember_message
+    end
   end
 end

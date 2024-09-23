@@ -24,7 +24,7 @@ defmodule RememblyWeb.Router do
   scope "/interactions" do
     pipe_through :api
 
-    post "/", InteractionsController, :greet
+    post "/", InteractionsController, :index
   end
 
   scope "/api" do
