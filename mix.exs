@@ -33,6 +33,7 @@ defmodule Remembly.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:httpoison, "~> 2.0"},
       {:ed25519, "~> 1.4.1"},
       {:open_api_spex, "~> 3.16"},
       {:redoc_ui_plug, "~> 0.2.1"},
