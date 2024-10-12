@@ -27,7 +27,7 @@ defmodule Remembly.Remember.Message do
   attributes do
     uuid_primary_key :id
 
-    attribute :content, :string, allow_nil?: false
+    attribute :content, :string, allow_nil?: false, public?: true
 
     timestamps()
   end
