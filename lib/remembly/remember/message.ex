@@ -29,7 +29,7 @@ defmodule Remembly.Remember.Message do
 
     attribute :content, :string, allow_nil?: false, public?: true
 
-    timestamps()
+    timestamps(public?: true)
   end
 
   calculations do
