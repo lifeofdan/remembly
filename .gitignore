@@ -35,3 +35,5 @@ remembly-*.tar
 npm-debug.log
 /assets/node_modules/
 
+#env files
+/config/*.secrets.exs

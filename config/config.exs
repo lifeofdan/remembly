@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+import_config "#{Mix.env}.secrets.exs"
+
 config :ash,
   include_embedded_source_by_default?: false,
   default_page_type: :keyset,
