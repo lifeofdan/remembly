@@ -43,7 +43,9 @@ defmodule RememblyWeb do
         layouts: [html: RememblyWeb.Layouts]
 
       import Plug.Conn
-      import RememblyWeb.Gettext
+
+      use Gettext,
+        backend: RememblyWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -85,7 +87,9 @@ defmodule RememblyWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import RememblyWeb.CoreComponents
-      import RememblyWeb.Gettext
+
+      use Gettext,
+        backend: RememblyWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
