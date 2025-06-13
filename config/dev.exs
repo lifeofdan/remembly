@@ -2,9 +2,9 @@ import Config
 
 # Configure your database
 config :remembly, Remembly.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
+  username: "dbuser",
+  password: "dbpassword",
+  hostname: "postgres",
   database: "remembly_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
