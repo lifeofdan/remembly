@@ -5,7 +5,7 @@ defmodule RememblyWeb.InteractionsController do
   def index(conn, params) do
     signature = conn |> get_req_header("x-signature-ed25519") |> List.first()
     timestamp = conn |> get_req_header("x-signature-timestamp") |> List.first()
-    public_key = System.get_env("DISCORD_PUBLIC_KEY")
+    public_key = Application.get_env(:remembly, :discord_public_key)
     body = params |> Jason.encode!()
 
     {response, _} =
