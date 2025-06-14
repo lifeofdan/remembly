@@ -31,4 +31,8 @@ defmodule Remembly.Remember.Category do
 
     timestamps(public?: true)
   end
+
+  relationships do
+    has_many :messages, Remembly.Remember.Message, public?: true
+  end
 end

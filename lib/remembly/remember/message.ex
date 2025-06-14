@@ -14,6 +14,10 @@ defmodule Remembly.Remember.Message do
   postgres do
     table "messages"
     repo Remembly.Repo
+
+    references do
+      reference :category, on_delete: :delete
+    end
   end
 
   actions do
