@@ -1,5 +1,6 @@
 defmodule Remembly.Remember do
   alias Remembly.Remember.Message
+  alias Remembly.Remember.Category
   use Ash.Domain, extensions: [AshJsonApi.Domain]
 
   json_api do
@@ -10,12 +11,22 @@ defmodule Remembly.Remember do
         index :read
         post :create
       end
+
+      base_route "/categories", Category do
+        get :read
+        index :read
+        post :create
+      end
     end
   end
 
   resources do
     resource Message do
       define :message, action: :remember_message
+    end
+
+    resource Category do
+      define :category, action: :remember_category
     end
   end
 end
