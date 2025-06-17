@@ -10,6 +10,7 @@ defmodule Remembly.MixProject do
       start_permanent: Mix.env() == :prod,
       consolidate_protocols: Mix.env() != :dev,
       aliases: aliases(),
+      listeners: [Phoenix.CodeReloader],
       deps: deps()
     ]
   end
@@ -34,6 +35,7 @@ defmodule Remembly.MixProject do
   defp deps do
     [
       {:httpoison, "~> 2.0"},
+      {:timex, "~> 3.0"},
       {:ed25519, "~> 1.4.1"},
       {:open_api_spex, "~> 3.16"},
       {:redoc_ui_plug, "~> 0.2.1"},
@@ -42,7 +44,7 @@ defmodule Remembly.MixProject do
       {:ash_postgres, "~> 2.0"},
       {:ash, "~> 3.0"},
       {:igniter, "~> 0.3"},
-      {:phoenix, "~> 1.7.14"},
+      {:phoenix, "~> 1.8.0-rc.3"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
