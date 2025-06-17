@@ -19,6 +19,7 @@ defmodule RememblyWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/messages", ShowMessages, :index
   end
 
   scope "/interactions" do
