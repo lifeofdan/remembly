@@ -4,8 +4,8 @@ defmodule Remembly.InstallGlobalCommands do
   def register_commands do
     debug("We register our commands...")
     base_url = "https://discord.com/api/v10"
-    app_id = System.get_env("DISCORD_APP_ID")
-    discord_token = System.get_env("DISCORD_TOKEN")
+    app_id = Application.get_env(:remembly, :application_id)
+    discord_token = Application.get_env(:remembly, :discord_public_key)
     body = Jason.encode!(Remembly.Commands.all_commands_list())
 
     HTTPoison.put("#{base_url}/applications/#{app_id}/commands", body,
