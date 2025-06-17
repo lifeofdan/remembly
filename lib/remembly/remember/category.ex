@@ -35,4 +35,8 @@ defmodule Remembly.Remember.Category do
   relationships do
     has_many :messages, Remembly.Remember.Message, public?: true
   end
+
+  aggregates do
+    count :message_count, :messages, public?: true
+  end
 end
