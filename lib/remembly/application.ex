@@ -19,7 +19,9 @@ defmodule Remembly.Application do
       # Start a worker by calling: Remembly.Worker.start_link(arg)
       # {Remembly.Worker, arg},
       # Start to serve requests, typically the last entry
-      RememblyWeb.Endpoint
+      RememblyWeb.Endpoint,
+      {Absinthe.Subscription, RememblyWeb.Endpoint},
+      AshGraphql.Subscription.Batcher
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

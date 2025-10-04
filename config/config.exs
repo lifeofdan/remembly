@@ -7,7 +7,8 @@
 # General application configuration
 import Config
 
-import_config "#{Mix.env}.secrets.exs"
+config :ash_graphql, authorize_update_destroy_with_error?: true
+import_config "#{Mix.env()}.secrets.exs"
 
 config :ash,
   include_embedded_source_by_default?: false,
@@ -19,6 +20,7 @@ config :spark,
     remove_parens?: true,
     "Ash.Resource": [
       section_order: [
+        :graphql,
         :json_api,
         :postgres,
         :resource,
@@ -38,7 +40,15 @@ config :spark,
       ]
     ],
     "Ash.Domain": [
-      section_order: [:json_api, :resources, :policies, :authorization, :domain, :execution]
+      section_order: [
+        :graphql,
+        :json_api,
+        :resources,
+        :policies,
+        :authorization,
+        :domain,
+        :execution
+      ]
     ]
   ]
 

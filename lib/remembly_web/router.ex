@@ -2,6 +2,10 @@ defmodule RememblyWeb.Router do
   alias RememblyWeb.InteractionsController
   use RememblyWeb, :router
 
+  pipeline :graphql do
+    plug AshGraphql.Plug
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -20,6 +24,19 @@ defmodule RememblyWeb.Router do
 
     get "/", PageController, :home
     live "/messages", ShowMessages, :index
+    live "/websites", ShowWebsites, :index
+    live "/memories", ShowMemories, :index
+  end
+
+  scope "/gql" do
+    pipe_through [:graphql]
+
+    forward "/playground", Absinthe.Plug.GraphiQL,
+      schema: Module.concat(["RememblyWeb.GraphqlSchema"]),
+      socket: Module.concat(["RememblyWeb.GraphqlSocket"]),
+      interface: :simple
+
+    forward "/", Absinthe.Plug, schema: Module.concat(["RememblyWeb.GraphqlSchema"])
   end
 
   scope "/interactions" do
