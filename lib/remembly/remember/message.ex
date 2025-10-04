@@ -14,16 +14,13 @@ defmodule Remembly.Remember.Message do
   postgres do
     table "messages"
     repo Remembly.Repo
-
-    references do
-      reference :category, on_delete: :delete
-    end
   end
 
   actions do
     defaults [:read, :destroy, create: :*, update: :*]
 
     create :remember_message do
+      primary? true
       accept [:reference_id, :content]
     end
   end
@@ -38,7 +35,7 @@ defmodule Remembly.Remember.Message do
   end
 
   relationships do
-    belongs_to :category, Remembly.Remember.Category, public?: true
+    belongs_to :memory, Remembly.Remember.Memory, public?: true
   end
 
   calculations do

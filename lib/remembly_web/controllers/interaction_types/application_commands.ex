@@ -41,17 +41,20 @@ defmodule RememblyWeb.InteractionTypes.ApplicationCommands do
     message = Map.get(messages, message_id)
 
     message_exists? =
-      Remembly.Remember.Message
-      |> Ash.Query.filter(reference_id == ^message_id)
+      Remembly.Remember.Memory
+      |> Ash.Query.filter(message.reference_id == ^message_id)
       |> Ash.read!()
-      # We do this to make the variable more readable
       |> Enum.empty?() == false
 
     if message_exists? do
       json(conn, %{type: 4, data: %{content: "Message is already saved"}})
     else
       # We optimistically store the message
-      Remembly.Remember.message!(%{reference_id: message_id, content: message["content"]})
+      Remembly.Remember.create_message_memory!(%{
+        source: "discord",
+        content: message["content"],
+        message_params: %{reference_id: message_id, content: message["content"]}
+      })
 
       categories =
         Remembly.Remember.Category

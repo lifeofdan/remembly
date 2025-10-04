@@ -33,10 +33,23 @@ defmodule Remembly.Remember.Category do
   end
 
   relationships do
-    has_many :messages, Remembly.Remember.Message, public?: true
+    belongs_to :parent, __MODULE__, public?: true
+    has_many :memories, Remembly.Remember.Memory, public?: true
   end
 
   aggregates do
-    count :message_count, :messages, public?: true
+    count :message_count, :memories do
+      public? true
+
+      filter expr(is_nil(message.id) == false)
+    end
+
+    count :website_count, :memories do
+      public? true
+
+      filter expr(is_nil(website.id) == false)
+    end
+
+    count :memory_count, :memories, public?: true
   end
 end

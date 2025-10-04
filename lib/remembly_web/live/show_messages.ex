@@ -43,6 +43,27 @@ defmodule RememblyWeb.ShowMessages do
               <p>
                 {message.content}
               </p>
+              <%= if is_nil(message.og_data) == false && is_nil(message.og_data.image) == false do %>
+                <div
+                  class="relative mt-4 h-48 rounded-lg bg-cover bg-center bg-no-repeat"
+                  style={"background-image: url('#{message.og_data.image}')"}
+                >
+                  <div class="absolute inset-0 bg-black bg-opacity-40 rounded-lg"></div>
+                  <div class="relative z-10 p-4 h-full flex flex-col justify-between">
+                    <%= if message.og_data.title do %>
+                      <h3 class="text-white font-bold text-lg">{message.og_data.title}</h3>
+                    <% end %>
+                    <div class="mt-auto">
+                      <%= if message.og_data.description do %>
+                        <p class="text-white text-sm mb-2">{message.og_data.description}</p>
+                      <% end %>
+                      <%= if message.og_data.site_name do %>
+                        <span class="text-white text-xs opacity-80">{message.og_data.site_name}</span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
             </div>
           </div>
         <% end %>
@@ -60,11 +81,9 @@ defmodule RememblyWeb.ShowMessages do
   @impl true
   def handle_event("filter_by_category", params, socket) do
     messages =
-      Remembly.Remember.Message
-      |> Ash.Query.for_read(:read)
+      Remembly.Remember.Memory
       |> Ash.Query.filter(category_id == ^params["category_id"])
-      |> Ash.read!()
-      |> Ash.load!(category: [:message_count])
+      |> Ash.read!(load: [category: :message_count])
       |> format_messages()
 
     {:noreply, assign(socket, messages: messages)}
@@ -77,24 +96,27 @@ defmodule RememblyWeb.ShowMessages do
   end
 
   defp fetch_messages do
-    messages =
-      Remembly.Remember.Message
-      |> Ash.Query.for_read(:read)
-      |> Ash.read!()
-      |> Ash.load!(category: [:message_count])
-
-    format_messages(messages)
+    Remembly.Remember.remember_message_memories!(load: [:category])
+    |> format_messages()
   end
 
   defp format_messages(messages) do
     Enum.map(messages, fn message ->
+      category_label =
+        if message.category do
+          shorten_string(message.category.label, 14)
+        else
+          "uncategorized"
+        end
+
       %{
         id: message.id,
         content: message.content,
+        og_data:
+          RememblyWeb.WebUtils.OgTools.get_urls_from_text(message.content)
+          |> RememblyWeb.WebUtils.OgTools.get_og_image_from_url(),
         inserted_at: Timex.format!(message.inserted_at, "%Y-%m-%d %H:%M", :strftime),
-        category_label:
-          "#{shorten_string(message.category.label, 14)} (#{message.category.message_count})",
-        message_count: message.category.message_count
+        category_label: category_label
       }
     end)
   end

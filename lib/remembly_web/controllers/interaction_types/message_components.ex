@@ -39,10 +39,12 @@ defmodule RememblyWeb.InteractionTypes.MessageComponents do
             option["value"] == category_id
           end)
 
+        dbg("Storing message #{target_message_id} in category #{category_label}")
+
         message =
-          Remembly.Remember.Message
-          |> Ash.Query.filter(Ash.Expr.expr(reference_id == ^target_message_id))
-          |> Ash.read_one!()
+          Remembly.Remember.Memory
+          |> Ash.Query.filter(message.reference_id == ^target_message_id)
+          |> Ash.read_one!(load: [:message])
 
         message
         |> Ash.Changeset.for_update(:update, %{category_id: category_id})
