@@ -59,7 +59,7 @@ defmodule RememblyWeb.ShowMemories do
         </div>
       </div>
       <div class="flex flex-wrap gap-4">
-        <.async_result :let={memories} id="memories" assign={@memories}>
+        <.async_result :let={memories} assign={@memories}>
           <:loading>Loading memories...</:loading>
           <%= if Enum.empty?(memories) do %>
             <p>No memories found.</p>
@@ -123,13 +123,19 @@ defmodule RememblyWeb.ShowMemories do
 
   @impl true
   def handle_event("filter_by_category", params, socket) do
-    memories =
-      Remembly.Remember.Memory
-      |> Ash.Query.filter(category_id == ^params["category_id"])
-      |> Ash.read!(load: [category: :memory_count])
-      |> format_memories()
+    %{"category_id" => category_id} = params
 
-    {:noreply, socket |> assign(memories: Phoenix.LiveView.AsyncResult.ok(memories))}
+    {:noreply,
+     socket
+     |> assign(memories: [])
+     |> assign_async(:memories, fn -> {:ok, %{memories: fetch_memories_filtered(category_id)}} end)}
+  end
+
+  def fetch_memories_filtered(category_id) do
+    Remembly.Remember.Memory
+    |> Ash.Query.filter(category_id == ^category_id)
+    |> Ash.read!(load: [category: :memory_count])
+    |> format_memories()
   end
 
   @impl true
@@ -152,10 +158,10 @@ defmodule RememblyWeb.ShowMemories do
 
   @impl true
   def handle_event("reset_categories", _unsigned_params, socket) do
-    memories = fetch_memories()
-
     {:noreply,
-     socket |> assign(memories: Phoenix.LiveView.AsyncResult.ok(memories), category_id: nil)}
+     socket
+     |> assign(memories: [], category_id: nil)
+     |> assign_async(:memories, fn -> {:ok, %{memories: fetch_memories()}} end)}
   end
 
   defp fetch_memories do
