@@ -9,6 +9,33 @@
   </div>
 </header>
 <main class="px-4 py-20 sm:px-6 lg:px-8">
+  <style>
+    .masonry-grid {
+      columns: 1;
+      column-gap: 1rem;
+      break-inside: avoid;
+    }
+
+    @media (min-width: 640px) {
+      .masonry-grid {
+        columns: 2;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .masonry-grid {
+        columns: 3;
+      }
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+      display: inline-block;
+      width: 100%;
+    }
+  </style>
+
   <div class="mx-auto max-w-6xl">
     <.flash_group flash={@flash} />
     {@inner_content}
