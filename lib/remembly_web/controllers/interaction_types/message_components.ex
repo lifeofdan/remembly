@@ -93,7 +93,7 @@ defmodule RememblyWeb.InteractionTypes.MessageComponents do
         [message_id] = data["values"]
 
         message =
-          Remembly.Remember.Message
+          Remembly.Remember.Memory
           |> Ash.Query.filter(id == ^message_id)
           |> Ash.read_first!()
 
