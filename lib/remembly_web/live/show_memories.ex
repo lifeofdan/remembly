@@ -26,6 +26,22 @@ defmodule RememblyWeb.ShowMemories do
           </button>
           <form phx-change="filter_by_category self-end">
             <fieldset class="fieldset min-w-48 pb-0">
+              <legend class="fieldset-legend">Filter by source</legend>
+              <select
+                class="select select-secondary"
+                phx-change="filter_by_category"
+                value={@category_id}
+                name="category_id"
+              >
+                <option disabled selected value={@category_id}>Select a source</option>
+                <%= for source <- @sources do %>
+                  <option value={source.value}>{source.label}</option>
+                <% end %>
+              </select>
+            </fieldset>
+          </form>
+          <form phx-change="filter_by_category self-end">
+            <fieldset class="fieldset min-w-48 pb-0">
               <legend class="fieldset-legend">Filter by category</legend>
               <select
                 class="select select-secondary"
@@ -43,42 +59,55 @@ defmodule RememblyWeb.ShowMemories do
         </div>
       </div>
       <div class="flex flex-wrap gap-4">
-        <%= for memory <- @memories do %>
-          <div class="card bg-base-100 w-96 shadow-sm border border-base-200">
-            <div class="card-body">
-              <div class="flex items-center justify-between">
-                <h2 class="card-title mr-6">{memory.inserted_at}</h2>
-                <span class="badge badge-primary">{memory.category_label}</span>
-              </div>
-              <span class="font-bold">Content:</span>
-              <p class="overflow-y-auto break-words">
-                {memory.content}
-              </p>
-              <%= if is_nil(memory.og_data) == false && is_nil(memory.og_data.image) == false do %>
-                <div
-                  class="relative mt-4 h-48 rounded-lg bg-cover bg-center bg-no-repeat"
-                  style={"background-image: url('#{memory.og_data.image}')"}
-                >
-                  <div class="absolute inset-0 bg-black bg-opacity-40 rounded-lg"></div>
-                  <div class="relative z-10 p-4 h-full flex flex-col justify-between">
-                    <%= if memory.og_data.title do %>
-                      <h3 class="text-white font-bold text-lg">{memory.og_data.title}</h3>
-                    <% end %>
-                    <div class="mt-auto">
-                      <%= if memory.og_data.description do %>
-                        <p class="text-white text-sm mb-2">{memory.og_data.description}</p>
-                      <% end %>
-                      <%= if memory.og_data.site_name do %>
-                        <span class="text-white text-xs opacity-80">{memory.og_data.site_name}</span>
-                      <% end %>
-                    </div>
+        <.async_result :let={memories} id="memories" assign={@memories}>
+          <:loading>Loading memories...</:loading>
+          <%= if Enum.empty?(memories) do %>
+            <p>No memories found.</p>
+          <% else %>
+            <%= for memory <- memories do %>
+              <div class="card bg-base-100 w-96 shadow-sm border border-base-200">
+                <div class="card-body">
+                  <div class="flex items-center justify-between">
+                    <h2 class="card-title mr-6">{memory.inserted_at}</h2>
+                    <span class="badge badge-primary">{memory.category_label}</span>
                   </div>
+                  <span class="font-bold">Content:</span>
+                  <p class="overflow-y-auto break-words">
+                    {memory.content}
+                  </p>
+                  <%= if is_nil(memory.og_data) == false && is_nil(memory.og_data.image) == false do %>
+                    <div
+                      class="relative mt-4 h-48 rounded-lg bg-cover bg-center bg-no-repeat"
+                      style={"background-image: url('#{memory.og_data.image}')"}
+                    >
+                      <div class="absolute inset-0 bg-black bg-opacity-40 rounded-lg"></div>
+                      <div class="relative z-10 p-4 h-full flex flex-col justify-between">
+                        <%= if memory.og_data.title do %>
+                          <h3 class="text-white font-bold text-lg">
+                            {shorten_string(memory.og_data.title, 40)}
+                          </h3>
+                        <% end %>
+                        <div class="mt-auto">
+                          <%= if memory.og_data.description do %>
+                            <p class="text-white text-sm mb-2">
+                              {shorten_string(memory.og_data.description, 90)}
+                            </p>
+                          <% end %>
+                          <%= if memory.og_data.site_name do %>
+                            <span class="text-white text-xs opacity-80">
+                              {memory.og_data.site_name}
+                            </span>
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                  <span>Source: {memory.source}</span>
                 </div>
-              <% end %>
-              <span>Source: {memory.source}</span>
-            </div>
-          </div>
-        <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </.async_result>
       </div>
     </div>
     """
@@ -87,7 +116,9 @@ defmodule RememblyWeb.ShowMemories do
   @impl true
   def mount(_params, _session, socket) do
     {:ok,
-     assign(socket, memories: fetch_memories(), categories: fetch_categories(), category_id: nil)}
+     socket
+     |> assign(sources: [], categories: fetch_categories(), category_id: nil)
+     |> assign_async(:memories, fn -> {:ok, %{memories: fetch_memories()}} end)}
   end
 
   @impl true
@@ -98,7 +129,7 @@ defmodule RememblyWeb.ShowMemories do
       |> Ash.read!(load: [category: :memory_count])
       |> format_memories()
 
-    {:noreply, assign(socket, memories: memories)}
+    {:noreply, socket |> assign(memories: Phoenix.LiveView.AsyncResult.ok(memories))}
   end
 
   @impl true
@@ -107,7 +138,7 @@ defmodule RememblyWeb.ShowMemories do
 
     if search_value == "" do
       memories = fetch_memories()
-      {:noreply, assign(socket, memories: memories)}
+      {:noreply, assign(socket, memories: Phoenix.LiveView.AsyncResult.ok(memories))}
     else
       memories =
         Remembly.Remember.remember_memory_by_term!(%{term: search_value},
@@ -115,14 +146,16 @@ defmodule RememblyWeb.ShowMemories do
         )
         |> format_memories()
 
-      {:noreply, assign(socket, memories: memories)}
+      {:noreply, assign(socket, memories: Phoenix.LiveView.AsyncResult.ok(memories))}
     end
   end
 
+  @impl true
   def handle_event("reset_categories", _unsigned_params, socket) do
     memories = fetch_memories()
 
-    {:noreply, assign(socket, memories: memories, category_id: nil)}
+    {:noreply,
+     socket |> assign(memories: Phoenix.LiveView.AsyncResult.ok(memories), category_id: nil)}
   end
 
   defp fetch_memories do
