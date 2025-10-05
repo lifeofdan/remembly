@@ -53,7 +53,7 @@ defmodule RememblyWeb.InteractionTypes.ApplicationCommands do
       Remembly.Remember.create_message_memory!(%{
         source: "discord",
         content: message["content"],
-        message_params: %{reference_id: message_id, content: message["content"]}
+        message_params: %{reference_id: message_id}
       })
 
       categories =

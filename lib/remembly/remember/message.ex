@@ -21,14 +21,13 @@ defmodule Remembly.Remember.Message do
 
     create :remember_message do
       primary? true
-      accept [:reference_id, :content]
+      accept [:reference_id]
     end
   end
 
   attributes do
     uuid_primary_key :id
 
-    attribute :content, :string, allow_nil?: false, public?: true
     attribute :reference_id, :string, allow_nil?: false
 
     timestamps(public?: true)
@@ -36,11 +35,6 @@ defmodule Remembly.Remember.Message do
 
   relationships do
     belongs_to :memory, Remembly.Remember.Memory, public?: true
-  end
-
-  calculations do
-    calculate :short_content, :string, Remembly.Remember.Message.Calculations.ShortContent,
-      allow_nil?: false
   end
 
   identities do
