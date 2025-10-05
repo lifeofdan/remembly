@@ -105,5 +105,6 @@ defmodule Remembly.Remember.Memory do
     belongs_to :category, Remembly.Remember.Category, public?: true
     has_one :website, Remembly.Remember.Website, public?: true
     has_one :message, Remembly.Remember.Message, public?: true
+    has_many :og_datas, Remembly.Remember.OgData, public?: true
   end
 end

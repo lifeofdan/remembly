@@ -30,13 +30,9 @@ defmodule Remembly.Remember do
   end
 
   resources do
-    resource Remembly.Remember.Message
-
     resource Remembly.Remember.Category do
       define :category, action: :remember_category
     end
-
-    resource Remembly.Remember.Website
 
     resource Remembly.Remember.Memory do
       define :create_website_memory, action: :create_website_memory
@@ -45,5 +41,9 @@ defmodule Remembly.Remember do
       define :remember_memories, action: :remember_memories
       define :remember_memory_by_term, action: :remember_memory_by_term
     end
+
+    resource Remembly.Remember.Message
+    resource Remembly.Remember.OgData
+    resource Remembly.Remember.Website
   end
 end
