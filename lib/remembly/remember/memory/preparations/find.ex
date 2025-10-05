@@ -16,7 +16,8 @@ defmodule Remembly.Remember.Memory.Preparations.Find do
     |> Ash.Query.filter(
       expr(
         ilike(content, "%" <> ^term <> "%") ||
-          ilike(description, "%" <> ^term <> "%")
+          ilike(description, "%" <> ^term <> "%") ||
+          ilike(category.label, "%" <> ^term <> "%")
       )
     )
   end
