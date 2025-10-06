@@ -380,7 +380,7 @@ defmodule RememblyWeb.CoreComponents do
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
           "input input-bordered input-secondary border-secondary w-full max-w-xs self-end",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
+          @errors == [] && "",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
