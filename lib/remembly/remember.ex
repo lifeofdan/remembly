@@ -35,15 +35,19 @@ defmodule Remembly.Remember do
     end
 
     resource Remembly.Remember.Memory do
-      define :create_website_memory, action: :create_website_memory
-      define :create_message_memory, action: :create_message_memory
+      define :create_website_memory
+      define :create_manual_memory
+      define :create_message_memory
       define :remember_message_memories
-      define :remember_memories, action: :remember_memories
-      define :remember_memory_by_term, action: :remember_memory_by_term
+      define :remember_memories
     end
 
     resource Remembly.Remember.Message
-    resource Remembly.Remember.OgData
+
+    resource Remembly.Remember.OgData do
+      define :create_og_data
+    end
+
     resource Remembly.Remember.Website
   end
 end
