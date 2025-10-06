@@ -21,4 +21,18 @@ defmodule Remembly.Resources.MemoryTest do
 
     assert memory.website.url == "https://example.com"
   end
+
+  test "remember website with og data" do
+    assert {:ok, memory} =
+             Remembly.Remember.create_website_memory(
+               %{
+                 description: "some description",
+                 content: "https://youtube.com",
+                 website_params: %{url: "https://youtube.com"}
+               },
+               load: :og_datas
+             )
+
+    assert memory.og_datas |> List.first() |> Map.get(:url) == "https://youtube.com"
+  end
 end
