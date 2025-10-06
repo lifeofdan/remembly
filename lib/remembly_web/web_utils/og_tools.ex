@@ -9,21 +9,21 @@ defmodule RememblyWeb.WebUtils.OgTools do
     |> Enum.map(fn [url | _] -> url end)
   end
 
-  def get_og_image_from_url([]), do: nil
+  def get_og_data_from_url([]), do: nil
 
-  def get_og_image_from_url([url | _]) do
+  def get_og_data_from_url([url | _]) do
     case HTTPoison.get(url, [], follow_redirect: true, max_redirect: 10) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        get_og_image_from_html(body)
+        get_og_data_from_html(body)
 
       _ ->
         nil
     end
   end
 
-  defp get_og_image_from_html(html) when is_nil(html), do: nil
+  defp get_og_data_from_html(html) when is_nil(html), do: nil
 
-  defp get_og_image_from_html(html) do
+  defp get_og_data_from_html(html) do
     document = Floki.parse_document!(html)
     og_tags = Floki.find(document, "meta[property^='og:']")
 

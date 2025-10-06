@@ -40,6 +40,8 @@ defmodule Remembly.Remember.Memory do
       change manage_relationship(:website_params, :website, type: :create)
       change manage_relationship(:category_id, :category, type: :append_and_remove)
       change set_attribute(:source, "website")
+
+      change after_action(&Remembly.Remember.Memory.Actions.FetchOgData.process/3)
     end
 
     create :create_message_memory do
@@ -52,6 +54,17 @@ defmodule Remembly.Remember.Memory do
       change manage_relationship(:message_params, :message, type: :create)
       change manage_relationship(:category_id, :category, type: :append_and_remove)
       change set_attribute(:source, arg(:source))
+
+      change after_action(&Remembly.Remember.Memory.Actions.FetchOgData.process/3)
+    end
+
+    create :create_manual_memory do
+      accept [:content, :description]
+
+      argument :category_id, :uuid, allow_nil?: true
+
+      change manage_relationship(:category_id, :category, type: :append_and_remove)
+      change after_action(&Remembly.Remember.Memory.Actions.FetchOgData.process/3)
     end
 
     update :categorize_memory do
@@ -62,6 +75,9 @@ defmodule Remembly.Remember.Memory do
     end
 
     read :remember_memories do
+      argument :term, :string
+
+      prepare Remembly.Remember.Memory.Preparations.Find
     end
 
     read :remember_website_memories do
@@ -76,12 +92,6 @@ defmodule Remembly.Remember.Memory do
 
     read :remember_message_memories do
       filter expr(is_nil(message.id) == false)
-    end
-
-    read :remember_memory_by_term do
-      argument :term, :string, allow_nil?: false
-
-      prepare Remembly.Remember.Memory.Preparations.Find
     end
   end
 
