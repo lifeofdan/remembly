@@ -8,7 +8,12 @@ defmodule RememblyWeb.ShowMemories do
   def render(assigns) do
     ~H"""
     <div class="memories">
-      <h1 class="text-2xl mb-4">Memories</h1>
+      <div class="flex justify-between">
+        <h1 class="text-2xl mb-4">Memories</h1>
+        <.button class="bg-primary" phx-click={show_modal("create_memory_modal")}>
+          <.icon name="hero-plus-solid" class="h-5 w-5" /> Create Memory
+        </.button>
+      </div>
       <div class="flex mb-8">
         <.form for={@form} phx-change="filter" phx-debounce="300" class="flex justify-end gap-4">
           <fieldset class="fieldset min-w-48 pb-0">
@@ -29,7 +34,6 @@ defmodule RememblyWeb.ShowMemories do
             <legend class="fieldset-legend">Filter by category</legend>
             <.input
               type="select"
-              class="select select-secondary"
               field={@form["category_id"]}
               name="category_id"
               options={@categories}
@@ -46,6 +50,21 @@ defmodule RememblyWeb.ShowMemories do
         id="memories_cards"
         memories={@memories}
       />
+
+      <.modal id="create_memory_modal">
+        <.form
+          for={@modal_form}
+          class="space-y-8"
+          phx-change="validate_modal"
+          phx-submit="submit_modal"
+        >
+          <.input type="text" field={@modal_form["content"]} label="Content" />
+          <.input type="text" field={@modal_form["description"]} label="Description" />
+          <.button type="submit" class="btn btn-primary">
+            Save
+          </.button>
+        </.form>
+      </.modal>
     </div>
     """
   end
@@ -59,16 +78,47 @@ defmodule RememblyWeb.ShowMemories do
         "source_value" => ""
       })
 
+    modal_form = Remembly.Remember.form_to_create_manual_memory() |> to_form()
+
     {:ok,
      socket
      |> assign(
        form: form,
+       modal_form: modal_form,
        sources: [],
        categories: [],
+       show_modal: false,
        memories: Phoenix.LiveView.AsyncResult.loading(),
        categories: []
      )
      |> start_async(:get_memories, fn -> fetch_memories() end)}
+  end
+
+  @impl true
+  def handle_event("validate_modal", %{"form" => params}, socket) do
+    form = AshPhoenix.Form.validate(socket.assigns.modal_form, params)
+    {:noreply, socket |> assign(modal_form: form)}
+  end
+
+  @impl true
+  def handle_event("submit_modal", %{"form" => params}, socket) do
+    case AshPhoenix.Form.submit(socket.assigns.modal_form, params: params) do
+      {:ok, _memory} ->
+        socket =
+          socket
+          |> put_flash(:success, "Memory created successfully")
+          |> push_navigate(to: ~p"/memories")
+
+        {:noreply, socket}
+
+      {:error, form} ->
+        socket =
+          socket
+          |> put_flash(:error, "Something went wrong")
+          |> assign(:form, form)
+
+        {:noreply, socket}
+    end
   end
 
   @impl true
@@ -85,6 +135,13 @@ defmodule RememblyWeb.ShowMemories do
        sources: sources,
        categories: categories
      )}
+  end
+
+  @impl true
+  def handle_event("validate_memory", %{"new_memory_form" => params}, socket) do
+    form = AshPhoenix.Form.validate(socket.assigns.new_memory_form, params)
+
+    {:noreply, assign(socket, new_memory_form: form)}
   end
 
   @impl true
