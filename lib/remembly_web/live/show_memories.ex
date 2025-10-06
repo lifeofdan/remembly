@@ -95,6 +95,22 @@ defmodule RememblyWeb.ShowMemories do
   end
 
   @impl true
+  def handle_async(:get_memories, {:ok, fetched_memories}, socket) do
+    %{memories: memories} = socket.assigns
+
+    sources = get_sources(fetched_memories)
+    categories = get_categories()
+
+    {:noreply,
+     socket
+     |> assign(
+       memories: Phoenix.LiveView.AsyncResult.ok(memories, fetched_memories),
+       sources: sources,
+       categories: categories
+     )}
+  end
+
+  @impl true
   def handle_event("validate_modal", %{"form" => params}, socket) do
     form = AshPhoenix.Form.validate(socket.assigns.modal_form, params)
     {:noreply, socket |> assign(modal_form: form)}
@@ -119,29 +135,6 @@ defmodule RememblyWeb.ShowMemories do
 
         {:noreply, socket}
     end
-  end
-
-  @impl true
-  def handle_async(:get_memories, {:ok, fetched_memories}, socket) do
-    %{memories: memories} = socket.assigns
-
-    sources = get_sources(fetched_memories)
-    categories = get_categories()
-
-    {:noreply,
-     socket
-     |> assign(
-       memories: Phoenix.LiveView.AsyncResult.ok(memories, fetched_memories),
-       sources: sources,
-       categories: categories
-     )}
-  end
-
-  @impl true
-  def handle_event("validate_memory", %{"new_memory_form" => params}, socket) do
-    form = AshPhoenix.Form.validate(socket.assigns.new_memory_form, params)
-
-    {:noreply, assign(socket, new_memory_form: form)}
   end
 
   @impl true
