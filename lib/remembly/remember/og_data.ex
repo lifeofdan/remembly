@@ -19,7 +19,15 @@ defmodule Remembly.Remember.OgData do
   end
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:read, :update, :destroy]
+
+    create :create_og_data do
+      accept [:url, :title, :description, :site_name, :image]
+
+      argument :memory_id, :uuid, allow_nil?: false
+
+      change manage_relationship(:memory_id, :memory, type: :append_and_remove)
+    end
   end
 
   attributes do
@@ -35,6 +43,6 @@ defmodule Remembly.Remember.OgData do
   end
 
   relationships do
-    belongs_to :memory, Remembly.Remember.Memory, public?: true
+    belongs_to :memory, Remembly.Remember.Memory, allow_nil?: false, public?: true
   end
 end
