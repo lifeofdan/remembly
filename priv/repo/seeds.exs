@@ -26,6 +26,15 @@ Remembly.Remember.create_website_memory!(%{
 })
 
 Remembly.Remember.create_website_memory!(%{
+  content: "https://www.sweetwater.com/",
+  description: "Sweetwater - Music Instruments and Pro Audio",
+  category_id: instruments.id,
+  website_params: %{
+    url: "https://www.sweetwater.com/"
+  }
+})
+
+Remembly.Remember.create_website_memory!(%{
   content: "Phoenix is a web development framework written in Elixir.",
   description: "Learning about Phoenix",
   category_id: programming.id,
@@ -40,15 +49,6 @@ Remembly.Remember.create_website_memory!(%{
   category_id: programming.id,
   website_params: %{
     url: "https://ash-hq.org/"
-  }
-})
-
-Remembly.Remember.create_website_memory!(%{
-  content: "https://www.sweetwater.com/?msockid=0f1516ee1b266e181b1302b41ab46f13",
-  description: "Sweetwater - Music Instruments and Pro Audio",
-  category_id: instruments.id,
-  website_params: %{
-    url: "https://www.sweetwater.com/"
   }
 })
 
@@ -90,4 +90,34 @@ Remembly.Remember.create_message_memory!(%{
   message_params: %{
     reference_id: "4"
   }
+})
+
+Remembly.Remember.create_website_memory!(%{
+  content: "https://github.com/bitboxer/opengraph_parser",
+  description: "OpenGraphEx GitHub repo",
+  category_id: programming.id,
+  website_params: %{
+    url: "https://github.com/bitboxer/opengraph_parser"
+  }
+})
+
+Remembly.Remember.create_website_memory!(%{
+  content: "https://github.com/lifeofdan/remembly",
+  description: "Remembly GitHub repo",
+  category_id: programming.id,
+  website_params: %{
+    url: "https://github.com/lifeofdan/remembly"
+  }
+})
+
+Remembly.Remember.create_manual_memory!(%{
+  content: "Remember to check the server logs for errors.",
+  description: "Server maintenance note",
+  category_id: home_lab.id
+})
+
+Remembly.Remember.create_manual_memory!(%{
+  content: "https://youtube.com https://github.com",
+  description: "Only one image is expected to be generated...",
+  category_id: default_category.id
 })
