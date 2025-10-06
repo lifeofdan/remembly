@@ -1,5 +1,5 @@
 defmodule Remembly.Remember do
-  use Ash.Domain, extensions: [AshJsonApi.Domain, AshGraphql.Domain]
+  use Ash.Domain, extensions: [AshJsonApi.Domain, AshGraphql.Domain, AshPhoenix]
 
   graphql do
     queries do
